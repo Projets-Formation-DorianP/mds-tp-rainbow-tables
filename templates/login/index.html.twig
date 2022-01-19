@@ -1,33 +1,40 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if error %}
-        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    <div class="container p-4">
+        <form id="loginForm" action="{{ path('login') }}" method="post" onsubmit="return encodePassword()">
 
-    <form id="loginForm" action="{{ path('login') }}" method="post" onsubmit="encodePassword()">
+        {% if error %}
+            <div class="text-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <br>
+        {% endif %}
 
-    <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="_username" value="{{ username }}"/>
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="_username" value="{{ username }}"/>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="_password"/>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="_password"/>
+        </div>
+
+        <div>
+            <input type="radio" id="sha1" name="algorithm" value="sha1" checked>
+            <label for="sha1">SHA1</label>
+
+            <input type="radio" id="sha256" name="algorithm" value="sha256">
+            <label for="sha256">SHA256</label>
+
+            <input type="radio" id="md5" name="algorithm" value="md5">
+            <label for="md5">MD5</label>
+
+            <br>
+            <span>Hash : </span>
+            <span id="hash"></span>
+        </div>
+
+            <button type="submit">Login</button>
+        </form>
     </div>
-
-    <div>
-        <input type="radio" id="sha1" name="algorithm" value="sha1">
-        <label for="sha1">SHA1</label>
-
-        <input type="radio" id="sha256" name="algorithm" value="sha256">
-        <label for="sha256">SHA256</label>
-
-        <input type="radio" id="md5" name="algorithm" value="md5">
-        <label for="md5">MD5</label>
-    </div>
-
-        <button type="submit">Login</button>
-    </form>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jshashes/1.0.8/hashes.min.js"></script>
     <script type="text/javascript">
@@ -39,15 +46,16 @@
             password = document.getElementById("password").value;
 
             if (algorithm == "sha1") {
-                document.getElementById("password").value = new Hashes.SHA1().hex(password);
+                password = new Hashes.SHA1().hex(password);
             }
             else if (algorithm == "sha256") {
-                document.getElementById("password").value = new Hashes.SHA256().hex(password);
+                password = new Hashes.SHA256().hex(password);
             }
             else if (algorithm == "md5") {
-                document.getElementById("password").value = new Hashes.MD5().hex(password);
+                password = new Hashes.MD5().hex(password);
             }
-            console.log(algorithm + " : " + document.getElementById("password").value);
+            document.getElementById("hash").innerHTML = password;
+            console.log(algorithm + " : " + password);
         }
     </script>
 {% endblock %}
